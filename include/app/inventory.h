@@ -110,66 +110,112 @@ template <typename T>
 List1D<T>::List1D()
 {
     // TODO
+    pList = new XArrayList<T>();
 }
 
 template <typename T>
 List1D<T>::List1D(int num_elements)
 {
     // TODO
+    pList = new XArrayList<T>();
+    for (int i = 0; i < num_elements; i++)
+    {
+        pList->add(T()); // Add default value
+    }
 }
 
 template <typename T>
 List1D<T>::List1D(const T *array, int num_elements)
 {
     // TODO
+    pList = new XArrayList<T>();
+    // Copy all elements from the array
+    for (int i = 0; i < num_elements; i++)
+    {
+        pList->add(array[i]);
+    }
 }
 
 template <typename T>
 List1D<T>::List1D(const List1D<T> &other)
 {
     // TODO
+    pList = new XArrayList<T>();
+    // Copy all elements from the other list
+    for (int i = 0; i < other.size(); i++)
+    {
+        pList->add(other.get(i));
+    }
 }
 
 template <typename T>
 List1D<T>::~List1D()
 {
     // TODO
+    if (pList != nullptr)
+    {
+        delete pList;
+        pList = nullptr;
+    }
 }
 
 template <typename T>
 int List1D<T>::size() const
 {
     // TODO
+    return pList->size();
 }
 
 template <typename T>
 T List1D<T>::get(int index) const
 {
     // TODO
+    return pList->get(index);
 }
 
 template <typename T>
 void List1D<T>::set(int index, T value)
 {
     // TODO
+    if (index < 0 || index > pList->size())
+    {
+        throw std::out_of_range("Index is out of range!");
+    }
+    if (index==pList->size()){
+        pList->add(value);
+        return;
+    }
+    pList->get(index) = value;
 }
 
 template <typename T>
 void List1D<T>::add(const T &value)
 {
     // TODO
+    pList->add(value);
 }
 
 template <typename T>
 string List1D<T>::toString() const
 {
     // TODO
+    stringstream ss;
+    ss << "[";
+    for (int i = 0; i < pList->size(); i++)
+    {
+        if (i > 0)
+            ss << ", ";
+        ss << pList->get(i);
+    }
+    ss << "]";
+    return ss.str();
 }
 
 template <typename T>
 ostream &operator<<(ostream &os, const List1D<T> &list)
 {
     // TODO
+    os << list.toString();
     return os;
 }
 
