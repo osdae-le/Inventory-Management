@@ -104,3 +104,4 @@ void dlistDemo6(){
     cout << setw(25) << left << "After changing an item: ";
     list.println();
 }
+

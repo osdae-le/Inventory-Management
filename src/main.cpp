@@ -2,18 +2,19 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
-//#include "test/tc_dlinkedlist.h"
-#include "test/tc_xarraylist.h"
+#include "test/tc_dlinkedlist.h"
+//#include "test/tc_xarraylist.h"
 //#include "test/tc_inventory.h"
 
 using namespace std;
 
-void (*func_ptr[5])() = {
-    xlistDemo1,
-    xlistDemo2,
-    xlistDemo3,
-    xlistDemo4,
-    xlistDemo5
+void (*func_ptr[6])() = {
+    dlistDemo1,
+    dlistDemo2,
+    dlistDemo3,
+    dlistDemo4,
+    dlistDemo5,
+    dlistDemo6
 };
 
 /*void (*func_ptr[15])() = {
@@ -43,7 +44,7 @@ int main(int argc, char **argv)
 {
     // cout << "Assignment-1" << endl;
     if (argc == 1) {
-        xlistDemo5();
+        dlistDemo1();
     }
     cout << "Program finished successfully!" << endl;
     return 0;
