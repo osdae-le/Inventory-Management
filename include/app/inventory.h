@@ -179,9 +179,10 @@ void List1D<T>::set(int index, T value)
     // TODO
     if (index < 0 || index > pList->size())
     {
-        throw std::out_of_range("Index is out of range!");
+        throw std::out_of_range("Index is out of range! in set(int index, T value)");
     }
-    if (index==pList->size()){
+    if (index == pList->size())
+    {
         pList->add(value);
         return;
     }
@@ -224,60 +225,218 @@ template <typename T>
 List2D<T>::List2D()
 {
     // TODO
+    pMatrix = new XArrayList<IList<T> *>();
 }
 
 template <typename T>
 List2D<T>::List2D(List1D<T> *array, int num_rows)
 {
     // TODO
+    pMatrix = new XArrayList<IList<T> *>();
+
+    // Add each row from the provided array
+    for (int i = 0; i < num_rows; i++)
+    {
+        // Create a new list for each row
+        IList<T> *newRow = new XArrayList<T>();
+
+        // Copy elements from the corresponding array row
+        for (int j = 0; j < array[i].size(); j++)
+        {
+            newRow->add(array[i].get(j));
+        }
+
+        // Add the new row to the matrix
+        pMatrix->add(newRow);
+    }
 }
 
 template <typename T>
 List2D<T>::List2D(const List2D<T> &other)
 {
     // TODO
+    pMatrix = new XArrayList<IList<T> *>();
+
+    // Copy each row from the other matrix
+    for (int i = 0; i < other.rows(); i++)
+    {
+        IList<T> *newRow = new XArrayList<T>();
+        List1D<T> sourceRow = other.getRow(i);
+
+        // Copy all elements from the source row
+        for (int j = 0; j < sourceRow.size(); j++)
+        {
+            newRow->add(sourceRow.get(j));
+        }
+
+        // Add the new row to the matrix
+        pMatrix->add(newRow);
+    }
 }
 
 template <typename T>
 List2D<T>::~List2D()
 {
     // TODO
+    if (pMatrix != nullptr)
+    {
+        // First, delete each row
+        for (int i = 0; i < pMatrix->size(); i++)
+        {
+            delete pMatrix->get(i);
+        }
+
+        // Then, delete the matrix itself
+        delete pMatrix;
+        pMatrix = nullptr;
+    }
 }
 
 template <typename T>
 int List2D<T>::rows() const
 {
     // TODO
+    return pMatrix->size();
 }
 
 template <typename T>
 void List2D<T>::setRow(int rowIndex, const List1D<T> &row)
 {
     // TODO
+    //  Check row index bounds
+    if (rowIndex < 0 || rowIndex > pMatrix->size())
+    {
+        throw std::out_of_range("Index is out of range!");
+    }
+
+    // Tạo hàng mới
+    IList<T> *newRow = new XArrayList<T>();
+    for (int i = 0; i < row.size(); i++)
+    {
+        newRow->add(row.get(i));
+    }
+
+    // TH1: Nếu `pMatrix` đang rỗng và `rowIndex == 0`, thêm hàng đầu tiên
+    if (pMatrix->size() == 0 && rowIndex == 0)
+    {
+        pMatrix->add(newRow);
+    }
+    // TH2: Nếu `rowIndex == pMatrix->size()`, thêm vào cuối
+    else if (rowIndex == pMatrix->size())
+    {
+        pMatrix->add(newRow);
+    }
+    // TH3: Nếu `rowIndex` nằm trong phạm vi, thay thế hàng cũ
+    else
+    {
+        // Tạo danh sách mới để lưu dữ liệu cập nhật
+        IList<IList<T> *> *newMatrix = new XArrayList<IList<T> *>();
+
+        for (int i = 0; i < pMatrix->size(); i++)
+        {
+            if (i == rowIndex)
+            {
+                // Thêm hàng mới vào vị trí `rowIndex`
+                newMatrix->add(newRow);
+                delete pMatrix->get(i); // Giải phóng bộ nhớ của hàng cũ
+            }
+            else
+            {
+                // Giữ nguyên các hàng khác
+                newMatrix->add(pMatrix->get(i));
+            }
+        }
+
+        // Giải phóng ma trận cũ
+        delete pMatrix;
+
+        // Gán ma trận mới vào `pMatrix`
+        pMatrix = newMatrix;
+    }
 }
 
 template <typename T>
 T List2D<T>::get(int rowIndex, int colIndex) const
 {
     // TODO
+    // Check if rowIndex is valid
+    if (rowIndex < 0 || rowIndex >= pMatrix->size())
+    {
+        throw std::out_of_range("Index is out of range!");
+    }
+
+    // Get the row
+    IList<T> *row = pMatrix->get(rowIndex);
+
+    // Check if colIndex is valid
+    if (colIndex < 0 || colIndex >= row->size())
+    {
+        throw std::out_of_range("Index is out of range!");
+    }
+
+    // Return the element
+    return row->get(colIndex);
 }
 
 template <typename T>
 List1D<T> List2D<T>::getRow(int rowIndex) const
 {
     // TODO
+    if (rowIndex < 0 || rowIndex >= pMatrix->size())
+    {
+        throw std::out_of_range("Index is out of range!");
+    }
+
+    // Get the row
+    IList<T> *row = pMatrix->get(rowIndex);
+
+    // Create a new List1D object
+    List1D<T> result;
+
+    // Copy elements from the row
+    for (int i = 0; i < row->size(); i++)
+    {
+        result.add(row->get(i));
+    }
+
+    return result;
 }
 
 template <typename T>
 string List2D<T>::toString() const
 {
     // TODO
+    stringstream ss;
+    ss << "[";
+
+    for (int i = 0; i < pMatrix->size(); i++)
+    {
+        if (i > 0)
+            ss << ", ";
+
+        // Get the row
+        IList<T> *row = pMatrix->get(i);
+
+        // Format the row
+        ss << "[";
+        for (int j = 0; j < row->size(); j++)
+        {
+            if (j > 0)
+                ss << ", ";
+            ss << row->get(j);
+        }
+        ss << "]";
+    }
+
+    ss << "]";
+    return ss.str();
 }
 
 template <typename T>
 ostream &operator<<(ostream &os, const List2D<T> &matrix)
 {
     // TODO
+    os << matrix.toString();
     return os;
 }
 
